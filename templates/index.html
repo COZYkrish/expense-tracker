@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+	<meta name="theme-color" content="#00f2fe">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Expense Tracker</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+	<style>
+		body.futuristic-bg {
+			background: #181a2a;
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+		.futuristic-canvas {
+			position: fixed;
+			top: 0; left: 0; width: 100vw; height: 100vh;
+			z-index: 0;
+			pointer-events: none;
+		}
+		.container {
+			position: relative;
+			z-index: 1;
+			box-shadow: 0 8px 32px rgba(60, 60, 120, 0.25), 0 1.5px 16px #00f2fe33;
+			border-radius: 24px;
+			backdrop-filter: blur(6px);
+		}
+		.animated-title {
+			letter-spacing: 3px;
+			font-size: 3rem;
+			background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		.subtitle {
+			color: #00f2fe;
+			font-size: 1.2rem;
+		}
+</style>
+</head>
+<body class="futuristic-bg">
+	<canvas id="futuristic-bg" class="futuristic-canvas"></canvas>
+	<div class="container">
+		<header>
+			<div style="display:flex;justify-content:space-between;align-items:center;">
+				<div>
+					<h1 class="animated-title">Expense Tracker</h1>
+					<p class="subtitle">Track your expenses with style!</p>
+				</div>
+				<button id="theme-toggle" aria-label="Toggle dark/light mode">
+					<span id="theme-icon">🌙</span>
+				</button>
+			</div>
+		</header>
+		<section class="add-expense-section">
+			<form action="/add" method="POST" id="expense-form">
+				<input type="text" name="name" placeholder="Expense Name" required>
+				<input type="number" name="amount" placeholder="Amount" step="0.01" min="0" required>
+				<select name="category" required>
+					<option value="" disabled selected>Select Category</option>
+					{% for cat in categories %}
+					<option value="{{ cat }}">{{ cat }}</option>
+					{% endfor %}
+					<option value="Other">Other</option>
+				</select>
+				<input type="date" name="date" max="{{ today }}" value="{{ today }}">
+				<button type="submit">Add Expense</button>
+			</form>
+		</section>
+		<section class="search-section">
+			<form method="get" style="display:inline-block; margin-right:10px;">
+				<select name="year">
+					<option value="">Year</option>
+					{% for m in months %}
+						<option value="{{ m[:4] }}" {% if selected_year == m[:4] %}selected{% endif %}>{{ m[:4] }}</option>
+					{% endfor %}
+				</select>
+				<select name="month">
+					<option value="">Month</option>
+					{% for m in months %}
+						<option value="{{ m[5:7] }}" {% if selected_month == m[5:7] %}selected{% endif %}>{{ m[5:7] }}</option>
+					{% endfor %}
+				</select>
+				<button type="submit">Filter</button>
+				<a id="csv-export" href="#" style="margin-left:12px;display:inline-block;padding:10px 18px;background:linear-gradient(90deg,#00f2fe 0%,#4facfe 100%);color:#232946;font-weight:700;border-radius:8px;text-decoration:none;box-shadow:0 2px 8px #00f2fe33;transition:background 0.2s;">Export CSV</a>
+			<script>
+			// CSV export button logic
+			document.getElementById('csv-export').addEventListener('click', function(e) {
+				e.preventDefault();
+				const year = document.querySelector('select[name="year"]').value;
+				const month = document.querySelector('select[name="month"]').value;
+				let url = '/export_csv';
+				if (year && month) url += `?year=${year}&month=${month}`;
+				else if (year) url += `?year=${year}`;
+				else if (month) url += `?month=${month}`;
+				window.location = url;
+			});
+			</script>
+			</form>
+			<input type="text" id="search-input" placeholder="Search expenses...">
+		</section>
+		<section class="expenses-section">
+			<table id="expenses-table">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Name</th>
+						<th>Amount ($)</th>
+						<th>Category</th>
+						<th>Date</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for expense in expenses %}
+					<tr class="expense-row">
+						<td>{{ loop.index }}</td>
+						<td class="expense-name">{{ expense.name }}</td>
+						<td class="expense-amount">{{ '%.2f'|format(expense.amount) }}</td>
+						<td class="expense-category">{{ expense.category if expense.category else 'Other' }}</td>
+						<td class="expense-date">{{ expense.date if expense.date else '' }}</td>
+						<td>
+							<form action="/delete/{{ loop.index0 }}" method="POST" class="delete-form">
+								<button type="submit" class="delete-btn">Delete</button>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+		<section class="summary-section">
+			<div class="summary-card">
+				<h2>Total Expenses</h2>
+				<p id="total-amount">${{ expenses | sum(attribute='amount') | round(2) }}</p>
+			</div>
+		</section>
+
+		<section class="analytics-section">
+			<h2 style="text-align:center; margin-bottom:10px;">Category-wise Analytics</h2>
+			<canvas id="categoryChart" width="400" height="220"></canvas>
+		</section>
+	</div>
+	</script>
+	<script id="category-data-json" type="application/json">{{ category_data|tojson }}</script>
+	<script>
+		// Prepare data for category-wise chart from Flask
+		const categoryData = JSON.parse(document.getElementById('category-data-json').textContent);
+		const chartLabels = Object.keys(categoryData);
+		const chartData = Object.values(categoryData);
+		const chartColors = [
+			'#6c63ff', '#48b1f3', '#ffb347', '#ff6b6b', '#43e97b', '#f8fafc', '#e0e7ff', '#3a3a7c', '#e63946', '#bdbdfc'
+		];
+		window.addEventListener('DOMContentLoaded', function() {
+			if (chartLabels.length > 0) {
+				const ctx = document.getElementById('categoryChart').getContext('2d');
+				new Chart(ctx, {
+					type: 'pie',
+					data: {
+						labels: chartLabels,
+						datasets: [{
+							data: chartData,
+							backgroundColor: chartColors,
+							borderWidth: 1
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: {
+							legend: { position: 'bottom' },
+							title: { display: false }
+						}
+					}
+				});
+			}
+		});
+		// GSAP animation for title
+		gsap.from('.animated-title', {duration: 1, y: -50, opacity: 0, ease: 'bounce'});
+		gsap.from('.subtitle', {duration: 1, y: 30, opacity: 0, delay: 0.5});
+		gsap.from('.add-expense-section', {duration: 1, x: -100, opacity: 0, delay: 0.7});
+		gsap.from('.expenses-section', {duration: 1, x: 100, opacity: 0, delay: 1});
+		gsap.from('.summary-section', {duration: 1, scale: 0.5, opacity: 0, delay: 1.2});
+
+		// Search/filter functionality
+		document.getElementById('search-input').addEventListener('input', function() {
+			const filter = this.value.toLowerCase();
+			document.querySelectorAll('.expense-row').forEach(row => {
+				const name = row.querySelector('.expense-name').textContent.toLowerCase();
+				if (name.includes(filter)) {
+					row.style.display = '';
+				} else {
+					row.style.display = 'none';
+				}
+			});
+		});
+
+		// Animated delete
+		document.querySelectorAll('.delete-form').forEach(form => {
+			form.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const row = this.closest('tr');
+				gsap.to(row, {duration: 0.5, opacity: 0, y: 30, onComplete: () => this.submit()});
+			});
+		});
+	</script>
+	<script>
+		// Dark/Light mode toggle
+		const themeToggle = document.getElementById('theme-toggle');
+		const themeIcon = document.getElementById('theme-icon');
+		function setTheme(mode) {
+			if (mode === 'dark') {
+				document.body.classList.add('dark-mode');
+				themeIcon.textContent = '☀️';
+			} else {
+				document.body.classList.remove('dark-mode');
+				themeIcon.textContent = '🌙';
+			}
+			localStorage.setItem('theme', mode);
+		}
+		themeToggle.addEventListener('click', function() {
+			const isDark = document.body.classList.contains('dark-mode');
+			setTheme(isDark ? 'light' : 'dark');
+		});
+		// On load, set theme from localStorage
+		window.addEventListener('DOMContentLoaded', function() {
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			setTheme(savedTheme);
+		});
+	</script>
+<script>
+// Dynamic tilt effect for .container
+window.addEventListener('DOMContentLoaded', function() {
+	const container = document.querySelector('.container');
+	if (window.innerWidth > 900 && container) {
+		container.addEventListener('mousemove', function(e) {
+			const rect = container.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			const centerX = rect.width / 2;
+			const centerY = rect.height / 2;
+			const rotateY = ((x - centerX) / centerX) * 10; // max 10deg
+			const rotateX = -((y - centerY) / centerY) * 8; // max 8deg
+			container.style.transform = `perspective(1200px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.04)`;
+		});
+		container.addEventListener('mouseleave', function() {
+			container.style.transform = 'perspective(1200px) rotateY(0deg) rotateX(0deg) scale(1.04)';
+		});
+	}
+});
+</script>
+<script>
+// Register service worker for PWA support
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', function() {
+		navigator.serviceWorker.register('/static/service-worker.js');
+	});
+}
+</script>
+</body>
+<script>
+// Futuristic animated background with moving lines and glowing dots
+const canvas = document.getElementById('futuristic-bg');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w; canvas.height = h;
+let lines = [], dots = [];
+function randomColor() {
+	const colors = ['#00f2fe', '#4facfe', '#43e97b', '#38f9d7', '#fa709a'];
+	return colors[Math.floor(Math.random() * colors.length)];
+}
+function createLines() {
+	lines = [];
+	for (let i = 0; i < 18; i++) {
+		lines.push({
+			x: Math.random() * w,
+			y: Math.random() * h,
+			len: 120 + Math.random() * 180,
+			angle: Math.random() * Math.PI * 2,
+			speed: 0.2 + Math.random() * 0.5,
+			color: randomColor(),
+			width: 1.5 + Math.random() * 2
+		});
+	}
+}
+function createDots() {
+	dots = [];
+	for (let i = 0; i < 32; i++) {
+		dots.push({
+			x: Math.random() * w,
+			y: Math.random() * h,
+			r: 2 + Math.random() * 3,
+			color: randomColor(),
+			alpha: 0.3 + Math.random() * 0.7,
+			dx: -0.5 + Math.random(),
+			dy: -0.5 + Math.random()
+		});
+	}
+}
+function draw() {
+	ctx.clearRect(0, 0, w, h);
+	// Draw lines
+	for (const l of lines) {
+		ctx.save();
+		ctx.strokeStyle = l.color;
+		ctx.globalAlpha = 0.18;
+		ctx.lineWidth = l.width;
+		ctx.beginPath();
+		ctx.moveTo(l.x, l.y);
+		ctx.lineTo(l.x + Math.cos(l.angle) * l.len, l.y + Math.sin(l.angle) * l.len);
+		ctx.stroke();
+		ctx.restore();
+		l.x += Math.cos(l.angle) * l.speed;
+		l.y += Math.sin(l.angle) * l.speed;
+		if (l.x < -200 || l.x > w + 200 || l.y < -200 || l.y > h + 200) {
+			l.x = Math.random() * w;
+			l.y = Math.random() * h;
+		}
+	}
+	// Draw dots
+	for (const d of dots) {
+		ctx.save();
+		ctx.globalAlpha = d.alpha;
+		ctx.beginPath();
+		ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+		ctx.fillStyle = d.color;
+		ctx.shadowColor = d.color;
+		ctx.shadowBlur = 12;
+		ctx.fill();
+		ctx.restore();
+		d.x += d.dx;
+		d.y += d.dy;
+		if (d.x < 0) d.x = w; if (d.x > w) d.x = 0;
+		if (d.y < 0) d.y = h; if (d.y > h) d.y = 0;
+	}
+	requestAnimationFrame(draw);
+}
+window.addEventListener('resize', () => {
+	w = window.innerWidth; h = window.innerHeight;
+	canvas.width = w; canvas.height = h;
+	createLines();
+	createDots();
+});
+createLines();
+createDots();
+draw();
+</script>
+</html>
