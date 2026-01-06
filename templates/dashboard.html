@@ -1,22 +1,22 @@
 {% extends 'base_dashboard.html' %}
 {% block content %}
-<div class="dashboard-cards">
-    <div class="dashboard-card">
-        <h3>Total Expenses</h3>
+<div class="dashboard-cards redesigned">
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">💸</span> Total Expenses</h3>
         <div class="value">${{ expenses | sum(attribute='amount') | round(2) }}</div>
         <div class="stat-label">Across all categories</div>
     </div>
-    <div class="dashboard-card">
-        <h3>Most Spent Category</h3>
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">🏆</span> Top Category</h3>
         <div class="value">{{ most_spent_category }}</div>
-        <div class="stat-label">Top spending area</div>
+        <div class="stat-label">Most spent area</div>
     </div>
-    <div class="dashboard-card">
-        <h3>Recent Activity</h3>
-        <ul style="list-style:none;padding:0;margin:0;">
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">🕒</span> Recent Activity</h3>
+        <ul class="recent-list">
         {% for expense in expenses[-3:]|reverse %}
-            <li style="margin-bottom:6px;font-size:1.05em;">
-                <span style="color:#00f2fe;font-weight:700;">{{ expense.name }}</span> - ${{ '%.2f'|format(expense.amount) }} <span style="opacity:0.7;">({{ expense.category }})</span>
+            <li>
+                <span class="expense-name">{{ expense.name }}</span> - <span class="expense-amount">${{ '%.2f'|format(expense.amount) }}</span> <span class="expense-category">({{ expense.category }})</span>
             </li>
         {% else %}
             <li>No recent activity.</li>
@@ -24,20 +24,20 @@
         </ul>
     </div>
     <div class="dashboard-card my-card">
-        <h3>My Card</h3>
+        <h3><span class="icon">💳</span> My Card</h3>
         <div class="value">$5,750.20</div>
-        <div style="font-size:0.95em;opacity:0.8;">5282 3456 7890 1289</div>
-        <div style="font-size:0.95em;opacity:0.8;">09/25</div>
-        <div style="margin-top:10px;">
+        <div class="card-details">5282 3456 7890 1289</div>
+        <div class="card-details">09/25</div>
+        <div class="card-actions">
             <button class="wallet-btn">Manage Cards</button>
-            <button class="wallet-btn" style="margin-left:8px;">Transfer</button>
+            <button class="wallet-btn">Transfer</button>
         </div>
     </div>
 </div>
 <div class="dashboard-flex">
     <div class="dashboard-left">
         <div class="dashboard-overview">
-            <h3 style="color:#00f2fe;font-weight:900;letter-spacing:1px;">Monthly Overview</h3>
+            <h3 class="overview-title">Monthly Overview</h3>
             <canvas id="overviewChart" height="120"></canvas>
             <div style="margin-top:18px;">
                 <span style="color:#00f2fe;font-weight:700;">Tip:</span> Hover over bars for details. <span style="opacity:0.7;">Track your monthly spending trends!</span>

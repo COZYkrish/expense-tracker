@@ -4,76 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%); min-height: 100vh; }
-        .dashboard-layout { display: flex; min-height: 100vh; }
-        .sidebar {
-            width: 250px;
-            background: #232946;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            padding: 32px 0 0 0;
-            box-shadow: 2px 0 24px #23294622;
-        }
-        .sidebar h2 { font-size: 1.6rem; margin: 0 0 32px 32px; letter-spacing: 2px; }
-        .sidebar nav { flex: 1; }
-        .sidebar nav ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar nav ul li { margin-bottom: 18px; }
-        .sidebar nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 32px;
-            display: block;
-            border-left: 4px solid transparent;
-            font-weight: 600;
-            transition: background 0.2s, border-color 0.2s;
-        }
-        .sidebar nav ul li a.active, .sidebar nav ul li a:hover {
-            background: #1a1a2e;
-            border-left: 4px solid #00f2fe;
-        }
-        .sidebar .profile {
-            margin: 32px 0 0 0;
-            padding: 24px 32px;
-            border-top: 1px solid #393e6e44;
-            display: flex;
-            align-items: center;
-        }
-        .sidebar .profile img {
-            width: 48px; height: 48px; border-radius: 50%; margin-right: 16px;
-        }
-        .sidebar .profile .info { font-size: 1rem; }
+        body { font-family: 'Orbitron', 'Montserrat', Arial, sans-serif; }
         .main-content { flex: 1; padding: 40px 48px; }
-        .dashboard-cards { display: flex; gap: 32px; margin-bottom: 32px; }
-        .dashboard-card {
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 2px 16px #23294611;
-            padding: 28px 36px;
-            flex: 1;
-            min-width: 180px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .dashboard-card h3 { margin: 0 0 8px 0; font-size: 1.1rem; color: #232946; }
-        .dashboard-card .value { font-size: 2rem; font-weight: 800; color: #00f2fe; }
-        .dashboard-overview { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px #23294611; padding: 32px; margin-bottom: 32px; }
-        .dashboard-flex { display: flex; gap: 32px; }
-        .dashboard-left { flex: 2; }
-        .dashboard-right { flex: 1; display: flex; flex-direction: column; gap: 32px; }
-        .dashboard-table { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px #23294611; padding: 24px; margin-bottom: 32px; }
-        .dashboard-table table { width: 100%; border-collapse: collapse; }
-        .dashboard-table th, .dashboard-table td { padding: 12px 10px; text-align: left; }
-        .dashboard-table th { background: #e0e7ff; color: #232946; font-weight: 700; }
-        .dashboard-table tr:nth-child(even) { background: #f8fafc; }
-        .dashboard-table tr:hover { background: #e0e7ff; }
-        .dashboard-card.my-card { background: linear-gradient(120deg, #00f2fe 0%, #4facfe 100%); color: #fff; }
-        .dashboard-card.my-card .value { color: #fff; }
-        .dashboard-activity { background: #fff; border-radius: 18px; box-shadow: 0 2px 16px #23294611; padding: 24px; }
     </style>
 </head>
 <body>
