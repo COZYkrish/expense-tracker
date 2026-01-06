@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Orbitron', 'Montserrat', Arial, sans-serif; }
+        .main-content { flex: 1; padding: 40px 48px; }
+    </style>
+</head>
+<body>
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h2>DESIGNX</h2>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="{{ url_for('analytics') }}" class="{% if request.endpoint == 'analytics' %}active{% endif %}">Analytics</a></li>
+                <li><a href="{{ url_for('wallet') }}" class="{% if request.endpoint == 'wallet' %}active{% endif %}">Wallet</a></li>
+                <li><a href="{{ url_for('accounts') }}" class="{% if request.endpoint == 'accounts' %}active{% endif %}">Accounts</a></li>
+                <li><a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}">Settings</a></li>
+                <li><a href="{{ url_for('help_centre') }}" class="{% if request.endpoint == 'help_centre' %}active{% endif %}">Help Centre</a></li>
+            </ul>
+        </nav>
+        <div class="profile">
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+            <div class="info">
+                <div><b>Maanvi S</b></div>
+                <div style="font-size:0.95em;opacity:0.7;">General Manager</div>
+            </div>
+        </div>
+    </aside>
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+</body>
+</html>

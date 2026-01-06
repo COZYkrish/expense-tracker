@@ -1,0 +1,21 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}
+<h2>Help Centre</h2>
+<div class="help-section">
+    <h4>Frequently Asked Questions</h4>
+    <ul>
+        <li>How do I add an expense?</li>
+        <li>How do I export my data?</li>
+        <li>How do I contact support?</li>
+        <li>How do I reset my password?</li>
+        <li>How do I enable dark mode?</li>
+    </ul>
+    <form method="post" style="margin-top:18px;display:flex;flex-direction:column;gap:10px;max-width:340px;">
+        <label for="supportEmail">Contact Support:</label>
+        <input type="email" name="supportEmail" placeholder="Your Email" required>
+        <textarea name="supportMsg" placeholder="Describe your issue..." rows="3" required></textarea>
+        <button class="help-btn" type="submit">Send Message</button>
+    </form>
+    <div style="margin-top:24px;opacity:0.8;">Our team will respond within 24 hours.</div>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}
+<div class="dashboard-cards redesigned">
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">💸</span> Total Expenses</h3>
+        <div class="value">${{ expenses | sum(attribute='amount') | round(2) }}</div>
+        <div class="stat-label">Across all categories</div>
+    </div>
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">🏆</span> Top Category</h3>
+        <div class="value">{{ most_spent_category }}</div>
+        <div class="stat-label">Most spent area</div>
+    </div>
+    <div class="dashboard-card highlight">
+        <h3><span class="icon">🕒</span> Recent Activity</h3>
+        <ul class="recent-list">
+        {% for expense in expenses[-3:]|reverse %}
+            <li>
+                <span class="expense-name">{{ expense.name }}</span> - <span class="expense-amount">${{ '%.2f'|format(expense.amount) }}</span> <span class="expense-category">({{ expense.category }})</span>
+            </li>
+        {% else %}
+            <li>No recent activity.</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <div class="dashboard-card my-card">
+        <h3><span class="icon">💳</span> My Card</h3>
+        <div class="value">$5,750.20</div>
+        <div class="card-details">5282 3456 7890 1289</div>
+        <div class="card-details">09/25</div>
+        <div class="card-actions">
+            <button class="wallet-btn">Manage Cards</button>
+            <button class="wallet-btn">Transfer</button>
+        </div>
+    </div>
+</div>
+<div class="dashboard-flex">
+    <div class="dashboard-left">
+        <div class="dashboard-overview">
+            <h3 class="overview-title">Monthly Overview</h3>
+            <canvas id="overviewChart" height="120"></canvas>
+            <div style="margin-top:18px;">
+                <span style="color:#00f2fe;font-weight:700;">Tip:</span> Hover over bars for details. <span style="opacity:0.7;">Track your monthly spending trends!</span>
+            </div>
+        </div>
+        <div class="dashboard-table">
+            <h3>Transaction</h3>
+            <!-- Add Expense Form -->
+            <form action="/add" method="POST" id="expense-form" style="margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                <input type="text" name="name" placeholder="Expense Name" required style="flex:2 1 180px;min-width:160px;">
+                <input type="number" name="amount" placeholder="Amount" step="0.01" min="0" required style="flex:1 1 100px;min-width:100px;">
+                <select name="category" required style="flex:1 1 120px;min-width:120px;">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="date" name="date" value="{{ datetime.utcnow().strftime('%Y-%m-%d') }}" style="flex:1 1 140px;min-width:120px;">
+                <button type="submit">Add Expense</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <ul class="flashes">
+                  {% for category, message in messages %}
+                    <li style="color:#00f2fe;font-weight:700;list-style:none;">{{ message }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+            <table>
+                <thead>
+                    <tr style="color:#232946;font-weight:900;">
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Amount ($)</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr style="color:#232946;font-weight:700;">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ expense.name }}</td>
+                        <td>{{ '%.2f'|format(expense.amount) }}</td>
+                        <td>{{ expense.category if expense.category else 'Other' }}</td>
+                        <td>{{ expense.date if expense.date else '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="dashboard-right">
+        <div class="dashboard-activity">
+            <h3 style="color:#00f2fe;font-weight:900;letter-spacing:1px;">Category Breakdown</h3>
+            <canvas id="activityChart" height="180"></canvas>
+            <div style="margin-top:18px;">
+                <span style="color:#00f2fe;font-weight:700;">Insight:</span> See which categories dominate your spending.
+            </div>
+        </div>
+    </div>
+</div>
+<script id="overview-data-json" type="application/json">{{ overview_data|tojson }}</script>
+<script>
+// Overview bar chart (income/outcome by month) using pre-rendered JSON
+const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+const overviewData = JSON.parse(document.getElementById('overview-data-json').textContent);
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+new Chart(overviewCtx, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [
+            { label: 'Income', data: overviewData.income, backgroundColor: '#00f2fe' },
+            { label: 'Outcome', data: overviewData.outcome, backgroundColor: '#4facfe' }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } } }
+});
+// Activity gauge (dummy data)
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+new Chart(activityCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Regular', 'Shopping', 'Other'],
+        datasets: [{
+            data: [55, 20, 25],
+            backgroundColor: ['#00f2fe', '#4facfe', '#fa709a'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        cutout: '70%',
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+</script>
+{% endblock %}
