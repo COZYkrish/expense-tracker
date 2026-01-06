@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h2>FinDash Admin</h2>
+        <a class="active">Loans</a>
+        <a href="/auth/logout">Logout</a>
+    </aside>
+
+    <main class="content">
+        <h1>Loan Applications</h1>
+
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Tenure</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for loan in loans %}
+            <tr class="status-{{ loan.status }}">
+                <td>{{ loan.borrower }}</td>
+                <td>₹{{ loan.amount }}</td>
+                <td>{{ loan.tenure }}</td>
+                <td>{{ loan.status }}</td>
+                <td>
+                    {% if loan.status == "Pending" %}
+                        <a class="btn approve" href="/admin/approve/{{ loan.id }}">Approve</a>
+                        <a class="btn reject" href="/admin/reject/{{ loan.id }}">Reject</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
+</div>
+
+</body>
+</html>

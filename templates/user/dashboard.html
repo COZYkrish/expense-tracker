@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h2>FinDash</h2>
+        <a class="active">Dashboard</a>
+        <a href="/auth/logout">Logout</a>
+    </aside>
+
+    <main class="content">
+        <h1>My Loans</h1>
+
+        <!-- Apply Loan -->
+        <div class="panel">
+            <h3>Apply for Loan</h3>
+            <form method="post" action="/user/apply" class="loan-form">
+                <input type="number" name="amount" placeholder="Amount ₹" required>
+                <input type="number" name="tenure" placeholder="Tenure (months)" required>
+                <button>Apply Loan</button>
+            </form>
+        </div>
+
+        <!-- Loan List -->
+        <div class="panel">
+            <h3>Loan History</h3>
+            <table>
+                <tr>
+                    <th>Amount</th>
+                    <th>Tenure</th>
+                    <th>Status</th>
+                </tr>
+                {% for loan in loans %}
+                <tr class="status-{{ loan.status }}">
+                    <td>₹{{ loan.amount }}</td>
+                    <td>{{ loan.tenure }} months</td>
+                    <td>{{ loan.status }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

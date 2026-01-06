@@ -1,0 +1,49 @@
+.loan-form input {
+    padding: 10px;
+    margin-right: 10px;
+}
+
+.loan-form button {
+    padding: 10px 20px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform .3s;
+}
+
+.loan-form button:hover {
+    transform: scale(1.05);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+}
+
+tr {
+    transition: background .3s;
+}
+
+tr:hover {
+    background: #eef2ff;
+}
+
+.status-Pending { color: orange; }
+.status-Approved { color: green; }
+.status-Rejected { color: red; }
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.approve { background: #22c55e; color: white; }
+.reject { background: #ef4444; color: white; }
