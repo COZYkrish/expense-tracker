@@ -37,16 +37,41 @@
                     <th>Status</th>
                 </tr>
                 {% for loan in loans %}
-                <tr class="status-{{ loan.status }}">
+                <tr id="loan-{{ loan.id }}">
                     <td>₹{{ loan.amount }}</td>
                     <td>{{ loan.tenure }} months</td>
-                    <td>{{ loan.status }}</td>
+                    <td>
+                        <span class="status-badge {{ loan.status }}">
+                            {{ loan.status }}
+                        </span>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
         </div>
     </main>
 </div>
+<script>
+function refreshLoans() {
+    fetch("/user/loans")
+        .then(response => response.json())
+        .then(loans => {
+            loans.forEach(loan => {
+                const row = document.getElementById(`loan-${loan.id}`);
+                if (row) {
+                    const badge = row.querySelector(".status-badge");
+                    badge.innerText = loan.status;
+                    badge.className = `status-badge ${loan.status}`;
+                }
+            });
+        });
+}
+
+// refresh every 5 seconds
+setInterval(refreshLoans, 5000);
+</script>
 
 </body>
 </html>
+<script>
+

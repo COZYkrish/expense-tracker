@@ -47,3 +47,34 @@ tr:hover {
 
 .approve { background: #22c55e; color: white; }
 .reject { background: #ef4444; color: white; }
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all .3s ease;
+}
+
+.status-badge.Pending {
+    background: #fff7ed;
+    color: #f97316;
+}
+
+.status-badge.Approved {
+    background: #ecfdf5;
+    color: #16a34a;
+}
+
+.status-badge.Rejected {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.pulse {
+    animation: pulse .5s ease;
+}
+
+@keyframes pulse {
+    0% { background: #eef2ff; }
+    100% { background: transparent; }
+}

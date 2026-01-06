@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from models.loan import Loan
 from extensions import db
@@ -23,3 +23,16 @@ def apply_loan():
     db.session.add(loan)
     db.session.commit()
     return redirect("/user")
+
+@user_bp.route("/loans")
+@login_required
+def user_loans_api():
+    loans = Loan.query.filter_by(user_id=current_user.id).all()
+    return jsonify([
+        {
+            "id": loan.id,
+            "amount": loan.amount,
+            "tenure": loan.tenure,
+            "status": loan.status
+        } for loan in loans
+    ])
