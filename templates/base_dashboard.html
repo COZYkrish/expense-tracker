@@ -4,20 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker Dashboard</title>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- 🔹 CORE STYLES -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body { font-family: 'Orbitron', 'Montserrat', Arial, sans-serif; }
-        .main-content { flex: 1; padding: 40px 48px; }
+        body {
+            font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px 48px;
+        }
     </style>
 </head>
+
 <body>
 <div class="dashboard-layout">
+
+    <!-- ================= SIDEBAR ================= -->
     <aside class="sidebar">
         <h2>DESIGNX</h2>
+
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
@@ -28,6 +47,15 @@
                 <li><a href="{{ url_for('help_centre') }}" class="{% if request.endpoint == 'help_centre' %}active{% endif %}">Help Centre</a></li>
             </ul>
         </nav>
+
+        <!-- 🌙 THEME TOGGLE (NEW) -->
+        <div class="theme-toggle" id="themeToggle" title="Toggle theme">
+            <span class="icon">☀</span>
+            <span class="icon">🌙</span>
+            <div class="toggle-ball"></div>
+        </div>
+
+        <!-- 👤 PROFILE -->
         <div class="profile">
             <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
             <div class="info">
@@ -36,9 +64,16 @@
             </div>
         </div>
     </aside>
+
+    <!-- ================= MAIN ================= -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
+
 </div>
+
+<!-- 🔹 THEME LOGIC -->
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
 </body>
 </html>

@@ -1,8 +1,30 @@
+/* =====================
+   LIGHT THEME (DEFAULT)
+===================== */
+
+:root {
+    --bg-main: #f5f7fb;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+
+    --primary: #4f46e5;
+    --secondary: #6366f1;
+    --accent: #22c55e;
+
+    --glass-blur: blur(14px);
+    --shadow-soft: 0 20px 40px rgba(0,0,0,0.08);
+    --transition: all 0.4s ease;
+}
+
 body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
-    background: #f4f6fb;
+    background: var(--bg-main);   
+    color: var(--text-main);      
+    transition: var(--transition);
 }
+
 
 .layout {
     display: flex;
@@ -77,4 +99,51 @@ body {
     background: white;
     padding: 25px;
     border-radius: 16px;
+}
+.kpi,
+canvas,
+.chart-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-soft);
+    border-radius: 16px;
+    transition: var(--transition);
+}
+/* =====================
+   THEME TOGGLE
+===================== */
+
+.theme-toggle {
+    width: 64px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 0 18px rgba(99,102,241,0.6);
+}
+
+.theme-toggle .icon {
+    font-size: 14px;
+    z-index: 2;
+}
+
+.toggle-ball {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition);
+    box-shadow: 0 0 12px rgba(255,255,255,0.8);
+}
+
+[data-theme="dark"] .toggle-ball {
+    transform: translateX(32px);
 }
