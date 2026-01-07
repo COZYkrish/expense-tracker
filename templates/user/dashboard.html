@@ -1,67 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Dashboard</title>
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/animations.css">
-</head>
-<body>
+{% extends "base_dashboard.html" %}
 
-<div class="layout">
-    <aside class="sidebar">
-        <h2>FinDash</h2>
-        <a class="active">Dashboard</a>
-        <a href="/auth/logout">Logout</a>
-    </aside>
+{% block content %}
+<h1>My Loans</h1>
 
-    <main class="content">
-        <h1>My Loans</h1>
+<!-- ================= APPLY LOAN ================= -->
+<div class="card">
+    <h3>Apply for Loan</h3>
 
-        <!-- Apply Loan -->
-        <div class="panel">
-            <h3>Apply for Loan</h3>
-            <form method="post" action="/user/apply" class="loan-form">
-                <input type="number" name="amount" placeholder="Amount ₹" required>
-                <input type="number" name="tenure" placeholder="Tenure (months)" required>
-                <button>Apply Loan</button>
-            </form>
-        </div>
-
-        <!-- Loan List -->
-        <div class="panel">
-            <h3>Loan History</h3>
-            <table>
-                <tr>
-                    <th>Amount</th>
-                    <th>Tenure</th>
-                    <th>Status</th>
-                </tr>
-                {% for loan in loans %}
-                <tr id="loan-{{ loan.id }}">
-                    <td>₹{{ loan.amount }}</td>
-                    <td>{{ loan.tenure }} months</td>
-                    <td>
-                        <span class="status-badge {{ loan.status }}">
-                            {{ loan.status }}
-                        </span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </main>
+    <form method="post" action="/user/apply" class="loan-form">
+        <input type="number" name="amount" placeholder="Amount ₹" required>
+        <input type="number" name="tenure" placeholder="Tenure (months)" required>
+        <button type="submit">Apply Loan</button>
+    </form>
 </div>
+
+<!-- ================= LOAN HISTORY ================= -->
+<div class="card">
+    <h3>Loan History</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Tenure</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for loan in loans %}
+            <tr id="loan-{{ loan.id }}">
+                <td>₹{{ loan.amount }}</td>
+                <td>{{ loan.tenure }} months</td>
+                <td>
+                    <span class="status {{ loan.status }}">
+                        {{ loan.status }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ================= AUTO REFRESH ================= -->
 <script>
 function refreshLoans() {
     fetch("/user/loans")
-        .then(response => response.json())
+        .then(res => res.json())
         .then(loans => {
             loans.forEach(loan => {
                 const row = document.getElementById(`loan-${loan.id}`);
                 if (row) {
-                    const badge = row.querySelector(".status-badge");
-                    badge.innerText = loan.status;
-                    badge.className = `status-badge ${loan.status}`;
+                    const badge = row.querySelector(".status");
+                    badge.textContent = loan.status;
+                    badge.className = `status ${loan.status}`;
                 }
             });
         });
@@ -70,8 +62,4 @@ function refreshLoans() {
 // refresh every 5 seconds
 setInterval(refreshLoans, 5000);
 </script>
-
-</body>
-</html>
-<script>
-
+{% endblock %}

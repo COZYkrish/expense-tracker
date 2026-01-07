@@ -1,10 +1,11 @@
-/* =====================
-   DARK THEME
-===================== */
+/* ===============================
+   DARK THEME OVERRIDES
+================================ */
 
 [data-theme="dark"] {
     --bg-main: #0b1120;
     --bg-card: rgba(17, 24, 39, 0.78);
+
     --text-main: #e5e7eb;
     --text-muted: #9ca3af;
 
@@ -12,5 +13,6 @@
     --secondary: #6366f1;
     --accent: #22c55e;
 
-    --shadow-soft: 0 25px 60px rgba(0,0,0,0.6);
+    --border-soft: rgba(255, 255, 255, 0.08);
+    --shadow-soft: 0 25px 60px rgba(0, 0, 0, 0.65);
 }

@@ -1,17 +1,17 @@
-const toggle = document.getElementById("themeToggle");
 const root = document.documentElement;
+const toggle = document.getElementById("themeToggle");
 
-// Load saved theme
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme) {
-    root.setAttribute("data-theme", savedTheme);
-}
+// Apply theme on page load
+const savedTheme = localStorage.getItem("theme") || "light";
+root.setAttribute("data-theme", savedTheme);
 
 // Toggle theme
-toggle.addEventListener("click", () => {
-    const isDark = root.getAttribute("data-theme") === "dark";
-    const newTheme = isDark ? "light" : "dark";
+if (toggle) {
+    toggle.addEventListener("click", () => {
+        const current = root.getAttribute("data-theme");
+        const next = current === "dark" ? "light" : "dark";
 
-    root.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-});
+        root.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+    });
+}

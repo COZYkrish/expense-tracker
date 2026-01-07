@@ -1,117 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard | FinDash</title>
+{% extends "base_dashboard.html" %}
 
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/animations.css">
+{% block content %}
+<h1>Loan Applications</h1>
 
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #ffffff;
-            border-radius: 16px;
-            overflow: hidden;
-        }
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Tenure</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
 
-        th, td {
-            padding: 14px;
-            text-align: center;
-        }
+        <tbody>
+            {% for loan in loans %}
+            <tr id="loan-{{ loan.id }}">
+                <td>{{ loan.borrower }}</td>
+                <td>₹{{ loan.amount }}</td>
+                <td>{{ loan.tenure }} months</td>
+                <td>
+                    <span class="status {{ loan.status }}">
+                        {{ loan.status }}
+                    </span>
+                </td>
+                <td>
+                    {% if loan.status == "Pending" %}
+                    <button class="btn approve"
+                            data-loan-id="{{ loan.id }}"
+                            onclick="updateStatus(this, 'Approved')">
+                        Approve
+                    </button>
 
-        th {
-            background: #f1f5f9;
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background: #f8fafc;
-        }
-
-        .btn {
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            margin: 0 4px;
-        }
-
-        .approve {
-            background: #22c55e;
-            color: white;
-        }
-
-        .reject {
-            background: #ef4444;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-
-<div class="layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-    <h2>FinDash</h2>
-
-    <a class="active" href="/admin">Loans</a>
-    <a href="/admin/analytics">Analytics</a>
-    <a href="/auth/logout">Logout</a>
-</aside>
-
-
-    <!-- Main -->
-    <main class="content">
-        <h1>Loan Applications</h1>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Amount</th>
-                    <th>Tenure</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for loan in loans %}
-                <tr id="loan-{{ loan.id }}">
-                    <td>{{ loan.borrower }}</td>
-                    <td>₹{{ loan.amount }}</td>
-                    <td>{{ loan.tenure }} months</td>
-                    <td>
-                        <span class="status-badge {{ loan.status }}">
-                            {{ loan.status }}
-                        </span>
-                    </td>
-                    <td>
-                        {% if loan.status == "Pending" %}
-                        <button class="btn approve"
-                                data-loan-id="{{ loan.id }}"
-                                onclick="updateStatus(this, 'Approved')">
-                            Approve
-                        </button>
-
-                        <button class="btn reject"
-                                data-loan-id="{{ loan.id }}"
-                                onclick="updateStatus(this, 'Rejected')">
-                            Reject
-                        </button>
-                        {% else %}
+                    <button class="btn reject"
+                            data-loan-id="{{ loan.id }}"
+                            onclick="updateStatus(this, 'Rejected')">
+                        Reject
+                    </button>
+                    {% else %}
                         —
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <script>
@@ -125,10 +60,10 @@ function updateStatus(button, status) {
     .then(data => {
         if (data.success) {
             const row = document.getElementById(`loan-${loanId}`);
-            const badge = row.querySelector(".status-badge");
+            const badge = row.querySelector(".status");
 
             badge.innerText = status;
-            badge.className = `status-badge ${status}`;
+            badge.className = `status ${status}`;
 
             row.querySelector("td:last-child").innerHTML = "—";
 
@@ -138,6 +73,4 @@ function updateStatus(button, status) {
     });
 }
 </script>
-
-</body>
-</html>
+{% endblock %}
