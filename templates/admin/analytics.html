@@ -1,125 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Analytics | FinDash</title>
+{% extends "base_dashboard.html" %}
 
-    <link rel="stylesheet" href="/static/css/base.css">
-    <link rel="stylesheet" href="/static/css/animations.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block content %}
+<h1>Analytics Dashboard</h1>
+<p class="subtitle">Loan performance overview</p>
 
-    <style>
-        /* KPI CARDS */
-        .kpis {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .kpi {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            animation: fadeUp .6s ease;
-        }
-
-        .kpi span {
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .kpi h2 {
-            font-size: 30px;
-            margin: 10px 0 0;
-        }
-
-        /* CHARTS */
-        .charts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 30px;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            height: 360px;
-            animation: fadeUp .7s ease;
-        }
-
-        .chart-card canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-    </style>
-</head>
-<body>
-
-<div class="layout">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <h2>FinDash</h2>
-        <a href="/admin">Loans</a>
-        <a class="active">Analytics</a>
-        <a href="/auth/logout">Logout</a>
-    </aside>
-    <div class="theme-toggle" id="themeToggle">
-    <span class="icon">☀</span>
-    <span class="icon">🌙</span>
-    <div class="toggle-ball"></div>
+<!-- ================= KPI CARDS ================= -->
+<div class="kpis">
+    <div class="kpi">
+        <span>Total Loans</span>
+        <h2>{{ total_loans }}</h2>
     </div>
-
-
-    <!-- MAIN CONTENT -->
-    <main class="content">
-        <h1>Analytics Dashboard</h1>
-        <p class="subtitle">Loan performance overview</p>
-
-        <!-- KPI CARDS -->
-        <div class="kpis">
-            <div class="kpi">
-                <span>Total Loans</span>
-                <h2>{{ total_loans }}</h2>
-            </div>
-            <div class="kpi">
-                <span>Approved</span>
-                <h2>{{ approved }}</h2>
-            </div>
-            <div class="kpi">
-                <span>Pending</span>
-                <h2>{{ pending }}</h2>
-            </div>
-            <div class="kpi">
-                <span>Rejected</span>
-                <h2>{{ rejected }}</h2>
-            </div>
-            <div class="kpi">
-                <span>Total Amount</span>
-                <h2>₹{{ total_amount }}</h2>
-            </div>
-        </div>
-
-        <!-- CHARTS -->
-        <div class="charts">
-            <div class="chart-card">
-                <canvas id="statusChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <canvas id="monthlyChart"></canvas>
-            </div>
-        </div>
-    </main>
+    <div class="kpi">
+        <span>Approved</span>
+        <h2>{{ approved }}</h2>
+    </div>
+    <div class="kpi">
+        <span>Pending</span>
+        <h2>{{ pending }}</h2>
+    </div>
+    <div class="kpi">
+        <span>Rejected</span>
+        <h2>{{ rejected }}</h2>
+    </div>
+    <div class="kpi">
+        <span>Total Amount</span>
+        <h2>₹{{ total_amount }}</h2>
+    </div>
 </div>
 
-<!-- CHART SCRIPT -->
+<!-- ================= CHARTS ================= -->
+<div class="charts">
+    <div class="chart-card">
+        <canvas id="statusChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</div>
+
+<!-- ================= CHART JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 fetch("/admin/analytics/chart-data")
     .then(res => res.json())
     .then(data => {
 
-        // PIE CHART
         new Chart(document.getElementById("statusChart"), {
             type: "pie",
             data: {
@@ -133,17 +58,11 @@ fetch("/admin/analytics/chart-data")
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: "top"
-                    }
-                },
-                animation: {
-                    animateScale: true
+                    legend: { position: "top" }
                 }
             }
         });
 
-        // BAR CHART
         new Chart(document.getElementById("monthlyChart"), {
             type: "bar",
             data: {
@@ -158,21 +77,11 @@ fetch("/admin/analytics/chart-data")
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                animation: {
-                    duration: 1200
+                    y: { beginAtZero: true }
                 }
             }
         });
     })
     .catch(err => console.error("Chart error:", err));
 </script>
-
-</body>
-</html>
+{% endblock %}

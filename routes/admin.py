@@ -6,6 +6,9 @@ from extensions import db
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
+# ===============================
+# ADMIN DASHBOARD (LOANS)
+# ===============================
 @admin_bp.route("/")
 @login_required
 def dashboard():
@@ -16,6 +19,9 @@ def dashboard():
     return render_template("admin/dashboard.html", loans=loans)
 
 
+# ===============================
+# UPDATE LOAN STATUS
+# ===============================
 @admin_bp.route("/update-status/<int:loan_id>/<status>", methods=["POST"])
 @login_required
 def update_status(loan_id, status):
