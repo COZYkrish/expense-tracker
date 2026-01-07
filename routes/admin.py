@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from models.loan import Loan
 from extensions import db
@@ -7,9 +7,9 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 # ===============================
-# ADMIN DASHBOARD (LOANS)
+# ADMIN DASHBOARD (MAIN)
 # ===============================
-@admin_bp.route("/")
+@admin_bp.route("/dashboard")
 @login_required
 def dashboard():
     if current_user.role != "admin":
@@ -17,6 +17,13 @@ def dashboard():
 
     loans = Loan.query.all()
     return render_template("admin/dashboard.html", loans=loans)
+
+
+# Optional: redirect /admin → /admin/dashboard
+@admin_bp.route("/")
+@login_required
+def dashboard_redirect():
+    return redirect(url_for("admin.dashboard"))
 
 
 # ===============================
