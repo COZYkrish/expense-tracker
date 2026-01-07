@@ -18,6 +18,7 @@
 <div class="card">
     <h3>Loan History</h3>
 
+    {% if loans and loans|length > 0 %}
     <table>
         <thead>
             <tr>
@@ -40,6 +41,11 @@
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+        <p style="color: var(--text-muted);">
+            No loan history found.
+        </p>
+    {% endif %}
 </div>
 
 <!-- ================= AUTO REFRESH ================= -->
@@ -59,7 +65,6 @@ function refreshLoans() {
         });
 }
 
-// refresh every 5 seconds
 setInterval(refreshLoans, 5000);
 </script>
 {% endblock %}
