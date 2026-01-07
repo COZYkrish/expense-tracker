@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics | FinDash</title>
+
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            animation: fadeUp .6s ease;
+        }
+
+        .kpi h2 {
+            font-size: 28px;
+            margin: 10px 0;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        canvas {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h2>FinDash</h2>
+        <a href="/admin">Loans</a>
+        <a class="active">Analytics</a>
+        <a href="/auth/logout">Logout</a>
+    </aside>
+
+    <main class="content">
+        <h1>Analytics Dashboard</h1>
+        <p class="subtitle">Loan performance overview</p>
+
+        <!-- KPI CARDS -->
+        <div class="kpis">
+            <div class="kpi">
+                <span>Total Loans</span>
+                <h2>{{ total_loans }}</h2>
+            </div>
+            <div class="kpi">
+                <span>Approved</span>
+                <h2>{{ approved }}</h2>
+            </div>
+            <div class="kpi">
+                <span>Pending</span>
+                <h2>{{ pending }}</h2>
+            </div>
+            <div class="kpi">
+                <span>Rejected</span>
+                <h2>{{ rejected }}</h2>
+            </div>
+            <div class="kpi">
+                <span>Total Amount</span>
+                <h2>₹{{ total_amount }}</h2>
+            </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="charts">
+            <canvas id="statusChart"></canvas>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </main>
+</div>
+
+<script>
+fetch("/analytics/chart-data")
+    .then(res => res.json())
+    .then(data => {
+
+        new Chart(document.getElementById("statusChart"), {
+            type: "pie",
+            data: {
+                labels: Object.keys(data.status),
+                datasets: [{
+                    data: Object.values(data.status),
+                    backgroundColor: ["#22c55e", "#f97316", "#ef4444"]
+                }]
+            },
+            options: {
+                animation: { animateScale: true }
+            }
+        });
+
+        new Chart(document.getElementById("monthlyChart"), {
+            type: "bar",
+            data: {
+                labels: data.monthly.labels,
+                datasets: [{
+                    label: "Loans per Month",
+                    data: data.monthly.values,
+                    backgroundColor: "#4f46e5"
+                }]
+            },
+            options: {
+                animation: { duration: 1200 }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

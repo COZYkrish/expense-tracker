@@ -11,20 +11,25 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    # Register blueprints
+    # Import blueprints
     from routes.auth import auth_bp
-    from routes.admin import admin_bp
     from routes.user import user_bp
+    from routes.admin import admin_bp
+    from routes.analytics import analytics_bp
 
+    # Register blueprints
     app.register_blueprint(auth_bp)
-    app.register_blueprint(admin_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(analytics_bp)
 
     # Root route
     @app.route("/")
     def home():
         if current_user.is_authenticated:
-            return redirect("/admin" if current_user.role == "admin" else "/user")
+            if current_user.role == "admin":
+                return redirect("/admin")
+            return redirect("/user")
         return redirect("/auth/login")
 
     return app
@@ -35,4 +40,3 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True)
-
