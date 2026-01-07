@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Analytics | FinDash</title>
 
     <link rel="stylesheet" href="/static/css/base.css">
@@ -8,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* KPI CARDS */
         .kpis {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -22,27 +24,41 @@
             animation: fadeUp .6s ease;
         }
 
-        .kpi h2 {
-            font-size: 28px;
-            margin: 10px 0;
+        .kpi span {
+            color: #64748b;
+            font-weight: 500;
         }
 
+        .kpi h2 {
+            font-size: 30px;
+            margin: 10px 0 0;
+        }
+
+        /* CHARTS */
         .charts {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
             gap: 30px;
         }
 
-        canvas {
+        .chart-card {
             background: white;
             padding: 20px;
             border-radius: 16px;
+            height: 360px;
+            animation: fadeUp .7s ease;
+        }
+
+        .chart-card canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
     </style>
 </head>
 <body>
 
 <div class="layout">
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <h2>FinDash</h2>
         <a href="/admin">Loans</a>
@@ -50,6 +66,7 @@
         <a href="/auth/logout">Logout</a>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="content">
         <h1>Analytics Dashboard</h1>
         <p class="subtitle">Loan performance overview</p>
@@ -80,17 +97,23 @@
 
         <!-- CHARTS -->
         <div class="charts">
-            <canvas id="statusChart"></canvas>
-            <canvas id="monthlyChart"></canvas>
+            <div class="chart-card">
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <canvas id="monthlyChart"></canvas>
+            </div>
         </div>
     </main>
 </div>
 
+<!-- CHART SCRIPT -->
 <script>
-fetch("/analytics/chart-data")
+fetch("/admin/analytics/chart-data")
     .then(res => res.json())
     .then(data => {
 
+        // PIE CHART
         new Chart(document.getElementById("statusChart"), {
             type: "pie",
             data: {
@@ -101,10 +124,20 @@ fetch("/analytics/chart-data")
                 }]
             },
             options: {
-                animation: { animateScale: true }
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top"
+                    }
+                },
+                animation: {
+                    animateScale: true
+                }
             }
         });
 
+        // BAR CHART
         new Chart(document.getElementById("monthlyChart"), {
             type: "bar",
             data: {
@@ -116,10 +149,23 @@ fetch("/analytics/chart-data")
                 }]
             },
             options: {
-                animation: { duration: 1200 }
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1200
+                }
             }
         });
-    });
+    })
+    .catch(err => console.error("Chart error:", err));
 </script>
 
 </body>

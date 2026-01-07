@@ -4,9 +4,15 @@ from models.loan import Loan
 from extensions import db
 from sqlalchemy import func
 
-analytics_bp = Blueprint("analytics", __name__, url_prefix="/analytics")
+analytics_bp = Blueprint(
+    "analytics",
+    __name__,
+    url_prefix="/admin/analytics"
+)
 
-
+# -------------------------------
+# Analytics Dashboard Page
+# -------------------------------
 @analytics_bp.route("/")
 @login_required
 def dashboard():
@@ -18,7 +24,9 @@ def dashboard():
     pending = Loan.query.filter_by(status="Pending").count()
     rejected = Loan.query.filter_by(status="Rejected").count()
 
-    total_amount = db.session.query(func.sum(Loan.amount)).scalar() or 0
+    total_amount = db.session.query(
+        func.coalesce(func.sum(Loan.amount), 0)
+    ).scalar()
 
     return render_template(
         "admin/analytics.html",
@@ -30,24 +38,30 @@ def dashboard():
     )
 
 
+# -------------------------------
+# Chart Data API
+# -------------------------------
 @analytics_bp.route("/chart-data")
 @login_required
 def chart_data():
     if current_user.role != "admin":
-        return jsonify({})
+        return jsonify({"error": "Unauthorized"}), 403
 
+    # Loan status counts
     status_data = {
         "Approved": Loan.query.filter_by(status="Approved").count(),
         "Pending": Loan.query.filter_by(status="Pending").count(),
         "Rejected": Loan.query.filter_by(status="Rejected").count(),
     }
 
+    # SQLite-safe monthly grouping
     monthly_data = (
         db.session.query(
             func.strftime("%Y-%m", Loan.created_at),
             func.count(Loan.id)
         )
         .group_by(func.strftime("%Y-%m", Loan.created_at))
+        .order_by(func.strftime("%Y-%m", Loan.created_at))
         .all()
     )
 
@@ -58,3 +72,4 @@ def chart_data():
             "values": [row[1] for row in monthly_data]
         }
     })
+
