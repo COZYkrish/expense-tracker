@@ -132,6 +132,14 @@ body {
     border-radius: 50%;
     transition: var(--transition);
 }
+/* ===============================
+   TOGGLE BALL MOVE (DARK MODE)
+================================ */
+
+html[data-theme="dark"] .theme-toggle .toggle-ball {
+    transform: translateX(32px);
+}
+
 
 /* ===============================
    MAIN CONTENT
