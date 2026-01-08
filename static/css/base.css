@@ -297,30 +297,90 @@ td {
 }
 
 /* ===============================
-   STATUS BADGES
+   STATUS BADGES (ANIMATED – STEP 4)
 ================================ */
 
 .status {
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 16px;
     border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+
+    position: relative;
+    overflow: hidden;
 }
+
+/* Glow pulse layer */
+.status::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* ===============================
+   APPROVED
+================================ */
 
 .status.approved {
+    color: #16a34a;
     background: rgba(34, 197, 94, 0.15);
-    color: var(--accent);
 }
+
+.status.approved::after {
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.6);
+}
+
+/* ===============================
+   PENDING
+================================ */
 
 .status.pending {
-    background: rgba(234, 179, 8, 0.15);
-    color: #eab308;
+    color: #ca8a04;
+    background: rgba(234, 179, 8, 0.18);
 }
 
-.status.rejected {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+.status.pending::after {
+    box-shadow: 0 0 16px rgba(234, 179, 8, 0.6);
 }
+
+/* ===============================
+   REJECTED
+================================ */
+
+.status.rejected {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.18);
+}
+
+.status.rejected::after {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+}
+
+/* ===============================
+   GLOW ANIMATION
+================================ */
+
+@keyframes pulseGlow {
+    0% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        opacity: 0.4;
+    }
+}
+
 
 /* ===============================
    DARK MODE TOGGLE ANIMATION
