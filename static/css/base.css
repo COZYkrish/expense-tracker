@@ -498,3 +498,16 @@ td {
 #toast.error {
     border-left: 5px solid #ef4444;
 }
+/* ===============================
+   MICRO-INTERACTION HELPERS
+================================ */
+
+.clickable {
+    cursor: pointer;
+}
+
+.card,
+.kpi,
+.chart-card {
+    will-change: transform;
+}
